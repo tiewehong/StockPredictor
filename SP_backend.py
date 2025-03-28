@@ -25,8 +25,15 @@ def timeframe_default(start_date=None, end_date=None):
 # Meaning: Measures if stock is overbought (>70) or oversold (<30).
 # Bullish: RSI moves above 30 (from oversold).
 # Bearish: RSI moves below 70 (from overbought).
-def calculate_short_term_RSI(df, window=14):
-    pass  # Implement calculation here
+def calculate_short_term_RSI(df, window_length=14):
+    # Calculate difference in price between each day
+    delta = df['Close'].diff()
+    # Calculate the gains and losses in ABSOLUTE terms
+    gain = (delta.where(delta > 0, 0)).rolling(window=window_length).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=window_length).mean()
+    rs = gain/loss
+    df['RSI'] = 100 - (100 / (1 + rs))
+    return df
 
 # Stochastic Oscillator
 # Meaning: Measures closing price relative to recent range.
